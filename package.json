@@ -1,0 +1,19 @@
+{
+  "name": "todoapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  },
+  "scripts": {
+    "test": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

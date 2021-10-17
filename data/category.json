@@ -1,0 +1,21 @@
+[
+    {
+      "category": "Active",
+      "id": 1
+      
+    },
+    {
+      "category": "Social",
+      "id": 2
+      
+    },
+    {
+      "category": "Work",
+      "id": 3
+      
+    },
+    {
+      "category": "Personal",
+      "id": 4
+    }
+  ]
