@@ -30,7 +30,8 @@ export const getToDo = (req, res) => {
 
 export const postToDo = (req, res) => {
     const todo = req.body
-    todos.push(todo)
+    todo.id = todos.length + 1
+    todos.push(req.body)
     res.status(200).json("Success")
 }
 
@@ -41,8 +42,8 @@ export const deleteToDo = (req, res) => {
 }
 
 export const editToDo = (req, res) => {
-    let id = parseInt(req.params.id)
-    let todo = req.body.todo
+    let id = parseInt(req.body.id)
+    let todo = req.body
     let index = todos.findIndex(elm => elm.id === id)
 
     if(index >= 0){
