@@ -2,59 +2,97 @@
 // import categoriesList from "../data/category.json";
 import exp from 'constants'
 import {readFile} from 'fs/promises'
+import { Todos } from  '../models/todo.model.js'
 
-let todos = JSON.parse(await readFile(
-    new URL ('../data/todo.json', import.meta.url)
-))
+
+// let todos = JSON.parse(await readFile(
+//     new URL ('../data/todo.json', import.meta.url)
+// ))
 let categoryList = JSON.parse(await readFile(
     new URL ('../data/category.json', import.meta.url)
 ))
 
+
 // Start todos
-export const getAllToDos = (req, res) => {
+export const getAllToDos = async (req, res) => {
     console.log("getting all todos")
+    const todos = await Todos.find()
     res.status(200).json(todos)
 }
 
 export const getAllTodosByCategory = (req, res) => {
-    const category = req.params.category
-    let results = todos.filter(cate => cate.category === category)
-    res.status(200).json(results)
+    try{
+        Todos.find()
+            .where({category: req.params.category})
+            .exec((err, todos) => {
+                console.log(todos)
+                if(err) res.status(400).json({Message: `Couldn't find todo: ${err}`})
+                res.status(200).json(todos)
+            })
+    }
+    catch (err){
+        res.status(400).json({Message: `Couldn't Query: ${err}`})
+    }
 }
 
 export const getToDo = (req, res) => {
     const id = parseInt(req.params.id)
-    let filterToDo = todos.filter(elm => elm.id === id)
-    res.status(200).json(filterToDo)
+    try {
+        Todos.find()
+        .where({_id: req.params._id})
+        .exec((err, todo) => {
+            console.log(todo)
+            if(err) res.status(400).json({Message: `Couldn't find todo: ${err}`})
+            res.status(200).json(0)
+        })
+    }
+    catch(err){
+        res.status(400).json({Message: `Couldn't Query: ${err}`})
+    }
+    
 }
 
 export const postToDo = (req, res) => {
-    const todo = req.body
-    todo.id = todos.length + 1
-    todos.push(req.body)
-    res.status(200).json("Success")
+    const newTodo = new Todos({
+        title: req.body.title,
+        complete: false,
+        category: ""
+    })
+    try{
+        newTodo.save();
+        res.status(200).json({Message: "Todo created successfully!"})
+    }
+    catch (err){
+        res.status(400).json({Message: "Todo not created"})
+    }
 }
 
-export const deleteToDo = (req, res) => {
-    let _id = parseInt(req.params.id)
-    todos = todos.filter(({id}) => id !== _id)
-    res.status(200).json(todos)
+export const deleteToDo = async (req, res) => {
+    try{
+        Todos.deleteOne({ _id: req.params._id }, (err) => {
+            if (err) {
+                res.status(400).json({Message: `Could not find todo to delete: ${err}`})
+            }
+            res.status(200).json({ Message: "Successfully deleted todo"})
+        })
+    }
+    catch (err){
+        res.status(400).json({ Message: `Could not delete todo: ${err}`})
+    }
 }
 
 export const editToDo = (req, res) => {
-    let id = parseInt(req.body.id)
     let todo = req.body
-    let index = todos.findIndex(elm => elm.id === id)
 
-    if(index >= 0){
-        todos[index].category = todo.category
-        todos[index].title = todo.title
-        todos[index].complete = todo.complete
-        res.status(200).json("Success")
-    } else {
-        res.status(404).json("Not a Success")
+    try {
+        Todos.findOneAndUpdate({ _id: req.body._id }, todo)
+        res.status(200).json({ Message: "Updated todo"})
+    }
+    catch (err){
+        res.status(400).json({ Message: "Couldn't update todo"})
     }
 }
+
 
 // Start Category
 export const getCategory = (req, res) => {
