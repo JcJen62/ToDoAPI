@@ -1,4 +1,4 @@
-const server = 'http://localhost:5000/api/'
+const server = 'http://localhost:5000/api'
 
 // Add Item to do
 const userObject = {};
@@ -35,8 +35,8 @@ let fullListItem = document.querySelector('#toDoList');// ul saved as a variable
 fullListItem.addEventListener("click", (event) => { // Event listener listening on the ul
   if (event.target.matches(".delete-item-btn") || event.target.matches(".fa-trash")) {
     //seeing if target matches what is clicked
-    const deleteTodo = async (id) => {
-      const response = await fetch(`${server}/delete/${id}`, {
+    const deleteTodo = async (title) => {
+      const response = await fetch(`${server}/delete/${title}`, {
         method: 'DELETE'
       })
     }
@@ -76,6 +76,8 @@ async function FetchTodos() {
   return todos
 }
 
+let titleStore = ""
+
 // Displays todo items
 async function DisplayItems() {
   document.querySelector("#toDoList").innerHTML = "";
@@ -91,7 +93,7 @@ async function DisplayItems() {
     const itemCheckmark = document.createElement("input");
     itemCheckmark.classList.add("form-check-input");
     itemCheckmark.type = "checkbox";
-    itemCheckmark.setAttribute("id", `${element.id}`);
+    itemCheckmark.setAttribute("id", `${element.title}`);
     itemDiv.appendChild(itemCheckmark);
 
     // Creates p for todo item and appends to item-div
@@ -110,19 +112,20 @@ async function DisplayItems() {
     const itemEditBtn = document.createElement("button");
     itemEditBtn.innerHTML = '<i class="fas fa-edit"></i>';
     itemEditBtn.classList.add("edit-item-btn", "btn", "btn-light");
+    itemEditBtn.setAttribute('id', element.title)
     itemDiv.appendChild(itemEditBtn);
 
     // Creates save button
     const itemSaveBtn = document.createElement("button");
     itemSaveBtn.innerHTML = "<span>Save</span>";
     itemSaveBtn.classList.add("btn", "btn-light");
-    itemSaveBtn.setAttribute('id', `${element.id}`)
+    itemSaveBtn.setAttribute('id', `${element.title}`)
 
     // Creates delete button and appends to item-div
     const itemDeleteBtn = document.createElement("button");
-    itemDeleteBtn.innerHTML = '<i class="fas fa-trash" id=' + `${element.id}` + '></i>'; //gives garbage can button unique id, *this might be kind of ghetto
+    itemDeleteBtn.innerHTML = '<i class="fas fa-trash" id=' + `${element.title}` + '></i>'; //gives garbage can button unique id, *this might be kind of ghetto
     itemDeleteBtn.classList.add("delete-item-btn", "btn", "btn-danger");
-    itemDeleteBtn.setAttribute('id', `${element.id}`) //gives delete button a somewhat unique delete button
+    itemDeleteBtn.setAttribute('id', `${element.title}`) //gives delete button a somewhat unique delete button
 
     itemDiv.appendChild(itemDeleteBtn);
 
@@ -132,9 +135,10 @@ async function DisplayItems() {
     list.appendChild(itemDiv);
 
     // Edit button click event handler
-    itemEditBtn.addEventListener("click", () => {
+    itemEditBtn.addEventListener("click", (event) => {
       // Replaces edit button with save button
       itemEditBtn.replaceWith(itemSaveBtn);
+      titleStore = event.currentTarget.id
 
       // Replaces item with editTaskInput
       item.replaceWith(editTaskInput);
@@ -157,8 +161,8 @@ async function DisplayItems() {
       let updatedTask = {
         title: document.querySelector(".edit-user-task-input").value,
         category: "",
-        id: event.currentTarget.id,
-        complete: false
+        complete: false,
+        oldTitle: titleStore,
       }
     
         updateTodo(updatedTask)

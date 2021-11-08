@@ -18,7 +18,7 @@ apiRouter.get("/todos", getAllToDos)
 apiRouter.get("/todoCategory/:category", getAllTodosByCategory)
 apiRouter.get("/todoSelect/:id", getToDo)
 apiRouter.post("/todosAdd", postToDo)
-apiRouter.delete("/delete/:id", deleteToDo)
+apiRouter.delete("/delete/:title", deleteToDo)
 apiRouter.put("/todosEdit", editToDo)
 
 apiRouter.get("/categorySelect/:id", getCategory)

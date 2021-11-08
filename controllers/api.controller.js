@@ -16,8 +16,14 @@ let categoryList = JSON.parse(await readFile(
 // Start todos
 export const getAllToDos = async (req, res) => {
     console.log("getting all todos")
-    const todos = await Todos.find()
-    res.status(200).json(todos)
+    try {
+        const todos = await Todos.find().lean().exec()
+        res.status(200).json(todos)
+    }
+    catch (err) {
+        console.log(err)
+    }
+    
 }
 
 export const getAllTodosByCategory = (req, res) => {
@@ -69,7 +75,8 @@ export const postToDo = (req, res) => {
 
 export const deleteToDo = async (req, res) => {
     try{
-        Todos.deleteOne({ _id: req.params._id }, (err) => {
+        Todos.findOneAndDelete({title: req.params.title}, (err, todo) => {
+            console.log(todo)
             if (err) {
                 res.status(400).json({Message: `Could not find todo to delete: ${err}`})
             }
@@ -81,11 +88,16 @@ export const deleteToDo = async (req, res) => {
     }
 }
 
-export const editToDo = (req, res) => {
-    let todo = req.body
-
+export const editToDo = async (req, res) => {
+    let todo = {
+        title: req.body.title,
+        category: req.body.category,
+        complete: req.body.complete
+    }
+    console.log(req.body.oldTitle)
+    console.log(todo)
     try {
-        Todos.findOneAndUpdate({ _id: req.body._id }, todo)
+        const edit = await Todos.findOneAndUpdate({ title: req.body.oldTitle }, todo)
         res.status(200).json({ Message: "Updated todo"})
     }
     catch (err){
